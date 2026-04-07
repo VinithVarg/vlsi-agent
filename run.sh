@@ -13,3 +13,4 @@ mkdir -p "${OUTDIR}"
 PYTHONPATH=src python3 scripts/run_flow.py --spec "${SPEC}" --outdir "${OUTDIR}"
 
 echo "[INFO] Flow completed successfully"
+echo "[INFO] Outputs written to ${OUTDIR}"
