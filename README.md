@@ -36,23 +36,19 @@ vlsi-agent/
 
 ### 1. Clone the Repository
 
-git clone https://github.com/<YOUR_USERNAME>/vlsi-agent.git
+git clone https://github.com/VinithVarg/vlsi-agent.git
 cd vlsi-agent
 
----
 
 ### 2. Create Python Environment
 
 python3 -m venv .venv
 source .venv/bin/activate
 
----
-
 ### 3. Install Dependencies
 
 pip install -r requirements.txt
 
----
 
 ### 4. Install Required EDA Tools
 
@@ -69,27 +65,21 @@ iverilog -V
 vvp -V
 yosys -V
 
----
-
-## 🚀 Single Command Execution (GRADING REQUIREMENT)
+## 🚀 Single Command Execution
 
 Run the full pipeline:
 
 ./run.sh
 
----
-
 ## Running with Custom Input
 
 ./run.sh specs/fifo.yaml
 
----
 
 ## Running with Custom Output Directory
 
 ./run.sh specs/fifo.yaml my_outputs
 
----
 
 ## Under-the-Hood Command
 
@@ -97,7 +87,6 @@ The system internally runs:
 
 PYTHONPATH=src python3 scripts/run_flow.py --spec specs/fifo.yaml --outdir generated
 
----
 
 ## Input Description
 
@@ -114,18 +103,14 @@ The spec defines:
 * interface signals
 * functional behavior
 
----
-
 ## Output Description
 
 After execution, outputs are stored in:
 
-```text
 generated/
 ├── logs/
 ├── reports/
 └── rtl/
-```
 
 Typical outputs:
 
@@ -134,7 +119,6 @@ Typical outputs:
 * Synthesis reports
 * Generated RTL
 
----
 
 ## Expected Results (Verification)
 
@@ -144,13 +128,10 @@ For the provided FIFO example:
 
 PASS: deterministic FIFO smoke test
 
----
 
 ### Expected Generated Files
 
 generated/reports/fifo_sync.json
-
----
 
 ### Pipeline Status
 
@@ -177,8 +158,6 @@ The pipeline executes:
 
 The process is fully automated — no manual steps required.
 
----
-
 ## Running Hidden Testcases
 
 The system is spec-driven.
@@ -195,8 +174,6 @@ Optional output directory:
 
 No code changes are required.
 
----
-
 ## Reproducibility (Grader Instructions)
 
 The grader should be able to run:
@@ -210,8 +187,6 @@ pip install -r requirements.txt
 
 ./run.sh
 
----
-
 ## Verification Checklist
 
 After running:
@@ -222,16 +197,12 @@ After running:
 * ✔ synthesis report generated
 * ✔ `generated/reports/fifo_sync.json` exists
 
----
-
 ## Notes
 
 * Fully automated pipeline
 * No GUI required
 * No manual intervention
 * Designed for reproducible grading
-
----
 
 ## Author
 
