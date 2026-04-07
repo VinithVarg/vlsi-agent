@@ -1,0 +1,9 @@
+set root_dir [file normalize [file join [file dirname [info script]] ../..]]
+set rtl_path [file join $root_dir {{ output_dir }} rtl {{ ir.module_name }}.sv]
+set report_dir [file join $root_dir {{ output_dir }} reports openroad]
+
+file mkdir $report_dir
+
+puts "OpenROAD Tcl wrapper generated for {{ ir.module_name }}"
+puts "RTL path: $rtl_path"
+puts "Set technology-specific commands here before running a full PnR flow."

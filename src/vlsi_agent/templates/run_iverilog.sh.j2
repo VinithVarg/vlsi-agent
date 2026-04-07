@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
+RTL_PATH="$ROOT_DIR/{{ output_dir }}/rtl/{{ ir.module_name }}.sv"
+TB_PATH="$ROOT_DIR/{{ output_dir }}/tb/{{ ir.tb.module_name }}.sv"
+OUT_PATH="$ROOT_DIR/{{ output_dir }}/reports/{{ ir.tb.module_name }}.out"
+
+iverilog -g2012 -o "$OUT_PATH" "$RTL_PATH" "$TB_PATH"
+vvp "$OUT_PATH"

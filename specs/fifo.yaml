@@ -1,0 +1,21 @@
+design:
+  family: synchronous_fifo
+  module_name: fifo_sync
+
+parameters:
+  data_width: 8
+  depth: 8
+
+ports:
+  clk: clk
+  rst_n: rst_n
+  wr_en: wr_en
+  rd_en: rd_en
+  wdata: wdata
+  rdata: rdata
+  full: full
+  empty: empty
+
+tb:
+  module_name: fifo_sync_tb
+  write_count: 4

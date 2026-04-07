@@ -1,0 +1,55 @@
+module {{ ir.module_name }} (
+    input  logic                      {{ ir.ports.clk }},
+    input  logic                      {{ ir.ports.rst_n }},
+    input  logic                      {{ ir.ports.wr_en }},
+    input  logic                      {{ ir.ports.rd_en }},
+    input  logic [{{ ir.data_width - 1 }}:0] {{ ir.ports.wdata }},
+    output logic [{{ ir.data_width - 1 }}:0] {{ ir.ports.rdata }},
+    output logic                      {{ ir.ports.full }},
+    output logic                      {{ ir.ports.empty }}
+);
+
+    localparam int unsigned DATA_WIDTH = {{ ir.data_width }};
+    localparam int unsigned DEPTH = {{ ir.depth }};
+    localparam int unsigned ADDR_WIDTH = {{ ir.addr_width }};
+    localparam int unsigned COUNT_WIDTH = {{ ir.count_width }};
+    localparam logic [COUNT_WIDTH-1:0] DEPTH_COUNT = COUNT_WIDTH'({{ ir.depth }});
+
+    logic [DATA_WIDTH-1:0] mem [0:DEPTH-1];
+    logic [ADDR_WIDTH-1:0] wr_ptr_q;
+    logic [ADDR_WIDTH-1:0] rd_ptr_q;
+    logic [COUNT_WIDTH-1:0] count_q;
+    logic do_write;
+    logic do_read;
+
+    assign {{ ir.ports.full }} = (count_q == DEPTH_COUNT);
+    assign {{ ir.ports.empty }} = (count_q == 0);
+    assign do_write = {{ ir.ports.wr_en }} && !{{ ir.ports.full }};
+    assign do_read = {{ ir.ports.rd_en }} && !{{ ir.ports.empty }};
+
+    always_ff @(posedge {{ ir.ports.clk }}) begin
+        if (!{{ ir.ports.rst_n }}) begin
+            wr_ptr_q <= '0;
+            rd_ptr_q <= '0;
+            count_q <= '0;
+            {{ ir.ports.rdata }} <= '0;
+        end else begin
+            if (do_write) begin
+                mem[wr_ptr_q] <= {{ ir.ports.wdata }};
+                wr_ptr_q <= wr_ptr_q + 1'b1;
+            end
+
+            if (do_read) begin
+                {{ ir.ports.rdata }} <= mem[rd_ptr_q];
+                rd_ptr_q <= rd_ptr_q + 1'b1;
+            end
+
+            case ({do_write, do_read})
+                2'b10: count_q <= count_q + 1'b1;
+                2'b01: count_q <= count_q - 1'b1;
+                default: count_q <= count_q;
+            endcase
+        end
+    end
+
+endmodule

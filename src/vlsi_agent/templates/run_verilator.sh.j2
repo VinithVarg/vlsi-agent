@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
+RTL_PATH="$ROOT_DIR/{{ output_dir }}/rtl/{{ ir.module_name }}.sv"
+TB_PATH="$ROOT_DIR/{{ output_dir }}/tb/{{ ir.tb.module_name }}.sv"
+OBJ_DIR="$ROOT_DIR/{{ output_dir }}/reports/verilator_obj"
+
+mkdir -p "$OBJ_DIR"
+verilator --lint-only --timing -Wall "$RTL_PATH" "$TB_PATH"
+echo "verilator lint completed"

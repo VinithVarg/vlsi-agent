@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
+yosys -p "read_verilog -sv $ROOT_DIR/{{ output_dir }}/rtl/{{ ir.module_name }}.sv; synth -top {{ ir.module_name }}; stat; write_json $ROOT_DIR/{{ output_dir }}/reports/{{ ir.module_name }}.json"

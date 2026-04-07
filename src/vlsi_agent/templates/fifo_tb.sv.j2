@@ -1,0 +1,89 @@
+module {{ ir.tb.module_name }};
+
+    localparam int unsigned DATA_WIDTH = {{ ir.data_width }};
+    localparam int unsigned WRITE_COUNT = {{ ir.tb.write_count }};
+
+    logic {{ ir.ports.clk }};
+    logic {{ ir.ports.rst_n }};
+    logic {{ ir.ports.wr_en }};
+    logic {{ ir.ports.rd_en }};
+    logic [DATA_WIDTH-1:0] {{ ir.ports.wdata }};
+    logic [DATA_WIDTH-1:0] {{ ir.ports.rdata }};
+    logic {{ ir.ports.full }};
+    logic {{ ir.ports.empty }};
+
+    logic [DATA_WIDTH-1:0] expected [0:WRITE_COUNT-1];
+    int read_index;
+
+    {{ ir.module_name }} dut (
+        .{{ ir.ports.clk }}({{ ir.ports.clk }}),
+        .{{ ir.ports.rst_n }}({{ ir.ports.rst_n }}),
+        .{{ ir.ports.wr_en }}({{ ir.ports.wr_en }}),
+        .{{ ir.ports.rd_en }}({{ ir.ports.rd_en }}),
+        .{{ ir.ports.wdata }}({{ ir.ports.wdata }}),
+        .{{ ir.ports.rdata }}({{ ir.ports.rdata }}),
+        .{{ ir.ports.full }}({{ ir.ports.full }}),
+        .{{ ir.ports.empty }}({{ ir.ports.empty }})
+    );
+
+    initial begin
+        {{ ir.ports.clk }} = 1'b0;
+    end
+
+    /* verilator lint_off BLKSEQ */
+    always #5 {{ ir.ports.clk }} = ~{{ ir.ports.clk }};
+    /* verilator lint_on BLKSEQ */
+
+    initial begin
+{% for value in tb_values %}
+        expected[{{ loop.index0 }}] = {{ value }};
+{% endfor %}
+
+        {{ ir.ports.rst_n }} = 1'b0;
+        {{ ir.ports.wr_en }} = 1'b0;
+        {{ ir.ports.rd_en }} = 1'b0;
+        {{ ir.ports.wdata }} = '0;
+        read_index = 0;
+
+        repeat (2) @(posedge {{ ir.ports.clk }});
+        {{ ir.ports.rst_n }} = 1'b1;
+
+{% for value in tb_values %}
+        @(negedge {{ ir.ports.clk }});
+        {{ ir.ports.wr_en }} = 1'b1;
+        {{ ir.ports.wdata }} = {{ value }};
+        @(posedge {{ ir.ports.clk }});
+{% endfor %}
+        @(negedge {{ ir.ports.clk }});
+        {{ ir.ports.wr_en }} = 1'b0;
+        {{ ir.ports.wdata }} = '0;
+
+        if ({{ ir.ports.full }}) begin
+            $error("FIFO full flag asserted unexpectedly after partial writes");
+            $finish(1);
+        end
+
+{% for value in tb_values %}
+        @(negedge {{ ir.ports.clk }});
+        {{ ir.ports.rd_en }} = 1'b1;
+        @(posedge {{ ir.ports.clk }});
+        #1;
+        if ({{ ir.ports.rdata }} !== expected[read_index]) begin
+            $error("FIFO mismatch at index %0d: expected %0h got %0h", read_index, expected[read_index], {{ ir.ports.rdata }});
+            $finish(1);
+        end
+        read_index = read_index + 1;
+{% endfor %}
+        @(negedge {{ ir.ports.clk }});
+        {{ ir.ports.rd_en }} = 1'b0;
+
+        if (!{{ ir.ports.empty }}) begin
+            $error("FIFO expected empty flag to assert after reads");
+            $finish(1);
+        end
+
+        $display("PASS: deterministic FIFO smoke test");
+        $finish(0);
+    end
+
+endmodule
